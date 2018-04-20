@@ -17,14 +17,6 @@ public class FutureQueueExec {
         this.blockingQueue = new LinkedBlockingQueue(10);
     }
 
-    public synchronized void addTask(int value){
-        try {
-            blockingQueue.put(calculate(value));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public Future<Integer> calculate(int value){
         return executorService.submit(() -> value * value);
@@ -69,6 +61,7 @@ public class FutureQueueExec {
                                 Future<Integer> future = (Future) blockingQueue.peek();
                                 finishedFutures.addElement(future);
                                 blockingQueue.remove();
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
