@@ -17,8 +17,16 @@ public class FinishedFutures {
     }
 
     public synchronized void addElement(Future<Integer> future){
+        System.out.println(finishedFuturesList.size() + " element added");
         this.finishedFuturesList.add(future);
+        if(future.isDone()){
+            System.out.println("done");
+        } else {
+            System.out.println("not done");
+        }
     }
+
+
 
     public synchronized void printListElements(){
         if(!finishedFuturesList.isEmpty()){

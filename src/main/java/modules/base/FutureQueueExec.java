@@ -1,4 +1,5 @@
 package modules.base;
+import java.util.Random;
 import java.util.concurrent.*;
 
 public class FutureQueueExec {
@@ -19,7 +20,10 @@ public class FutureQueueExec {
 
 
     public Future<Integer> calculate(int value){
-        return executorService.submit(() -> value * value);
+        return executorService.submit(() -> {
+            Thread.sleep((new Random().nextInt(2000)));
+            return value * value;
+        });
     }
 
 
@@ -55,8 +59,8 @@ public class FutureQueueExec {
     public void begin() {
         try {
             new Thread(() -> {
-                    while(finishedFutures.getSize()<Configs.ITERATIONS){
-                        if(!blockingQueue.isEmpty() && ((Future) blockingQueue.peek()).isDone()) {
+                    while(finishedFutures.getSize()<Configs.ITERATIONS || !blockingQueue.isEmpty()){
+                        if(!blockingQueue.isEmpty() ) {
                             try {
                                 Future<Integer> future = (Future) blockingQueue.peek();
                                 finishedFutures.addElement(future);
@@ -82,8 +86,13 @@ public class FutureQueueExec {
 
         } finally {
             shutdownExecutor();
-            finishedFutures.printListElements();
-            System.out.println("Execution time: " + (System.currentTimeMillis() - timer) + "ms");
+            while(true) {
+                if (executorService.isTerminated()) {
+                    finishedFutures.printListElements();
+                    System.out.println("Execution time: " + (System.currentTimeMillis() - timer) + "ms");
+                    break;
+                }
+            }
         }
     }
 
